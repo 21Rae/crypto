@@ -1,0 +1,6 @@
+{
+  "name": "Tokenized Stock Exchange",
+  "description": "Onchain 24/7 tokenized stock trading platform UI replicating real-time tokenized stocks, ETFs, and market insights.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
