@@ -159,8 +159,9 @@ export const Navbar: React.FC<NavbarProps> = ({
           ) : (
             <button
               type="button"
+              disabled
               onClick={onOpenWalletModal}
-              className="px-3.5 py-1.5 text-xs font-semibold text-gray-800 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-2xs flex items-center gap-1.5"
+              className="px-3.5 py-1.5 text-xs font-semibold text-gray-800 bg-white border border-gray-300 rounded-lg opacity-50 cursor-not-allowed shadow-2xs flex items-center gap-1.5"
             >
               <Wallet className="w-3.5 h-3.5 text-gray-600" />
               <span>Connect Wallet</span>

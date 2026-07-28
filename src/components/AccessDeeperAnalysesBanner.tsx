@@ -218,8 +218,9 @@ export const AccessDeeperAnalysesBanner: React.FC<AccessDeeperAnalysesBannerProp
           <div className="pt-2">
             <button
               type="button"
+              disabled
               onClick={onConnectWallet}
-              className="inline-flex items-center justify-center px-6 py-3 bg-[#1C263A] hover:bg-[#25324C] text-white text-sm font-semibold rounded-xl border border-slate-700/60 transition-all cursor-pointer shadow-lg hover:scale-102 active:scale-98"
+              className="inline-flex items-center justify-center px-6 py-3 bg-[#1C263A] text-white text-sm font-semibold rounded-xl border border-slate-700/60 transition-all opacity-50 cursor-not-allowed shadow-lg"
             >
               Connect Wallet
             </button>

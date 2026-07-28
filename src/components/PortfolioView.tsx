@@ -263,8 +263,9 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
               <div className="pt-2">
                 <button
                   type="button"
+                  disabled
                   onClick={onOpenWalletModal}
-                  className="px-8 py-3.5 bg-[#1C1C1E] hover:bg-black text-white text-sm font-semibold rounded-2xl transition-all cursor-pointer shadow-md hover:scale-102 active:scale-98"
+                  className="px-8 py-3.5 bg-[#1C1C1E] text-white text-sm font-semibold rounded-2xl opacity-50 cursor-not-allowed shadow-md"
                 >
                   Connect Wallet
                 </button>
