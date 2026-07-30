@@ -3,6 +3,7 @@ import { StockAsset, CategoryFilter, SortOption } from '../types';
 import { StockCard } from './StockCard';
 import { AssetIcon } from './AssetIcon';
 import { Sparkline } from './Sparkline';
+import { AnimatedNumber } from './AnimatedNumber';
 import { Search, LayoutGrid, List, ChevronDown } from 'lucide-react';
 
 interface ExploreAssetsProps {
@@ -250,14 +251,18 @@ export const ExploreAssets: React.FC<ExploreAssetsProps> = ({
               {/* Price & Change */}
               <div className="text-right">
                 <div className="text-sm font-black text-gray-900">
-                  ${asset.price.toFixed(2)}
+                  <AnimatedNumber value={asset.price} prefix="$" decimals={2} />
                 </div>
                 <div
-                  className={`text-[11px] font-bold ${
+                  className={`text-[11px] font-bold flex items-center justify-end gap-1 ${
                     asset.isPositive ? 'text-emerald-600' : 'text-rose-600'
                   }`}
                 >
-                  {asset.isPositive ? '▲' : '▼'} ${Math.abs(asset.changeAmount).toFixed(2)} ({Math.abs(asset.changePercent).toFixed(2)}%)
+                  <span>{asset.isPositive ? '▲' : '▼'}</span>
+                  <AnimatedNumber value={Math.abs(asset.changeAmount)} prefix="$" decimals={2} showFlash={false} />
+                  <span>
+                    (<AnimatedNumber value={Math.abs(asset.changePercent)} suffix="%" decimals={2} showFlash={false} />)
+                  </span>
                 </div>
               </div>
             </div>

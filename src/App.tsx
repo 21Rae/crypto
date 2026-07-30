@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { HeroBanner } from './components/HeroBanner';
 import { TopLists } from './components/TopLists';
@@ -18,6 +18,7 @@ import { EXPLORE_ASSETS } from './data/stocks';
 import { StockAsset } from './types';
 
 export default function App() {
+  const [assets, setAssets] = useState<StockAsset[]>(EXPLORE_ASSETS);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedAsset, setSelectedAsset] = useState<StockAsset | null>(null);
   const [isWalletModalOpen, setIsWalletModalOpen] = useState<boolean>(false);
@@ -27,10 +28,43 @@ export default function App() {
   const [connectedWallet, setConnectedWallet] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<'explore' | 'portfolio' | 'tools' | 'resources' | 'account'>('explore');
+  const [selectedSubTool, setSelectedSubTool] = useState<string | undefined>(undefined);
+
+  // Live real-time price tick simulation for dynamic animated charts
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAssets((prevAssets) => {
+        const randomIndex = Math.floor(Math.random() * prevAssets.length);
+        const updated = [...prevAssets];
+        const target = updated[randomIndex];
+        const deltaPercent = (Math.random() - 0.48) * 0.003; // ~0.3% fluctuation
+        const newPrice = Number((target.price * (1 + deltaPercent)).toFixed(2));
+        const newSparkline = [...target.sparklineData];
+        newSparkline[newSparkline.length - 1] = Number(
+          (newSparkline[newSparkline.length - 1] * (1 + deltaPercent)).toFixed(2)
+        );
+
+        const updatedAsset = {
+          ...target,
+          price: newPrice,
+          changeAmount: Number((target.changeAmount + (newPrice - target.price)).toFixed(2)),
+          sparklineData: newSparkline,
+        };
+        updated[randomIndex] = updatedAsset;
+
+        // Keep open modal in sync if active
+        setSelectedAsset((curr) => (curr && curr.id === updatedAsset.id ? updatedAsset : curr));
+
+        return updated;
+      });
+    }, 3200);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleLogin = (email: string) => {
     setUserEmail(email);
-    setCurrentView('account');
+    setCurrentView('portfolio');
     setIsWelcomeModalOpen(true);
   };
 
@@ -41,7 +75,7 @@ export default function App() {
   };
 
   const handleSelectTicker = (ticker: string) => {
-    const found = EXPLORE_ASSETS.find(
+    const found = assets.find(
       (a) => a.ticker.toLowerCase() === ticker.toLowerCase()
     );
     if (found) {
@@ -77,7 +111,14 @@ export default function App() {
           onNavigateAccount={() => setCurrentView('account')}
           onStartOnboarding={() => setIsOnboardingOpen(true)}
           activeNavTab={currentView}
-          onSelectNavTab={(tab) => setCurrentView(tab as any)}
+          onSelectNavTab={(tab, subTool) => {
+            setCurrentView(tab as any);
+            if (subTool) {
+              setSelectedSubTool(subTool);
+            } else if (tab === 'tools') {
+              setSelectedSubTool('bridge');
+            }
+          }}
         />
 
         {/* Main Content View Switcher */}
@@ -98,7 +139,7 @@ export default function App() {
             onSelectAsset={(asset) => setSelectedAsset(asset)}
           />
         ) : currentView === 'tools' ? (
-          <ToolsView />
+          <ToolsView initialSubTool={selectedSubTool} />
         ) : currentView === 'resources' ? (
           <ResourcesView />
         ) : (
@@ -112,7 +153,7 @@ export default function App() {
             {/* Explore Assets Section */}
             <div id="explore-assets-section">
               <ExploreAssets
-                assets={EXPLORE_ASSETS}
+                assets={assets}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
                 onAssetClick={(asset) => setSelectedAsset(asset)}

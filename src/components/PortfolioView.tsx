@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { StockAsset } from '../types';
 import { AccessDeeperAnalysesBanner } from './AccessDeeperAnalysesBanner';
+import { DashboardView } from './DashboardView';
 
 interface PortfolioViewProps {
   connectedWallet: string | null;
@@ -33,6 +34,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
   userEmail,
   onOpenWalletModal,
   onStartOnboarding,
+  onSelectAsset,
 }) => {
   const [activeTab, setActiveTab] = useState<'positions' | 'activity' | 'yield'>('positions');
   const [currentSlide, setCurrentSlide] = useState<number>(0);
@@ -207,7 +209,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
 
   return (
     <div className="min-h-[85vh] flex flex-col justify-center relative bg-white animate-fadeIn">
-      {!connectedWallet ? (
+      {(!connectedWallet && !userEmail) ? (
         <>
           <div className="relative w-full py-16 sm:py-20 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center min-h-[65vh]">
             {/* Floating Asset Icons Background Cloud */}
@@ -961,257 +963,12 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
         <AccessDeeperAnalysesBanner onConnectWallet={onOpenWalletModal} />
         </>
       ) : (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-          {/* Portfolio Header Summary Card */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-sm relative overflow-hidden">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Total Portfolio Value
-                  </span>
-                  <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Live Onchain
-                  </span>
-                </div>
-
-                <div className="flex items-baseline gap-3">
-                  <h1 className="text-3xl sm:text-5xl font-semibold text-gray-900 tracking-tight">
-                    $12,166.35
-                  </h1>
-                  <span className="text-sm font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg flex items-center gap-1">
-                    <TrendingUp className="w-3.5 h-3.5" />
-                    +$404.60 (+3.44%)
-                  </span>
-                </div>
-
-                <p className="text-xs text-gray-500 font-normal">
-                  Wallet: {connectedWallet.slice(0, 6)}...{connectedWallet.slice(-4)} • Ethereum Mainnet
-                </p>
-              </div>
-
-              {/* Action CTA Buttons */}
-              <div className="flex flex-wrap items-center gap-3">
-                <button
-                  type="button"
-                  onClick={onStartOnboarding}
-                  className="px-5 py-3 bg-[#1e40af] hover:bg-blue-800 text-white text-xs font-semibold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
-                >
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>KYC / Investor Profile</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={onOpenWalletModal}
-                  className="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5"
-                >
-                  <Wallet className="w-3.5 h-3.5 text-gray-500" />
-                  <span>Wallet Options</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Quick Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-6 border-t border-gray-100">
-              <div>
-                <div className="text-xs text-gray-400 font-normal">Yield Earned</div>
-                <div className="text-base sm:text-lg font-semibold text-emerald-600 mt-0.5">
-                  +$210.00 USDY
-                </div>
-              </div>
-              <div>
-                <div className="text-xs text-gray-400 font-normal">Current APY</div>
-                <div className="text-base sm:text-lg font-semibold text-gray-900 mt-0.5">
-                  5.20%
-                </div>
-              </div>
-              <div>
-                <div className="text-xs text-gray-400 font-normal">Ondo Tokenized Stocks</div>
-                <div className="text-base sm:text-lg font-semibold text-gray-900 mt-0.5">
-                  $6,956.35
-                </div>
-              </div>
-              <div>
-                <div className="text-xs text-gray-400 font-normal">KYC Verification</div>
-                <div className="text-base sm:text-lg font-semibold text-emerald-600 mt-0.5 flex items-center gap-1">
-                  <ShieldCheck className="w-4 h-4" />
-                  Verified
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Tabs Switcher */}
-          <div className="flex items-center justify-between border-b border-gray-200 pb-1">
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setActiveTab('positions')}
-                className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer ${
-                  activeTab === 'positions'
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Tokenized Positions ({positions.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab('activity')}
-                className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer ${
-                  activeTab === 'activity'
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Transaction History
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab('yield')}
-                className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer ${
-                  activeTab === 'yield'
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                USDY Yield Rewards
-              </button>
-            </div>
-          </div>
-
-          {/* Tab Content: Positions */}
-          {activeTab === 'positions' && (
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-gray-50/50 text-[11px] font-semibold text-gray-400 uppercase tracking-wider border-b border-gray-100">
-                      <th className="py-4 px-6">Asset Name</th>
-                      <th className="py-4 px-6">Balance</th>
-                      <th className="py-4 px-6">Token Price</th>
-                      <th className="py-4 px-6">Total Value</th>
-                      <th className="py-4 px-6">Unrealized PnL</th>
-                      <th className="py-4 px-6 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100 text-xs sm:text-sm">
-                    {positions.map((pos) => (
-                      <tr key={pos.id} className="hover:bg-gray-50/60 transition-colors">
-                        <td className="py-4 px-6">
-                          <div className="flex items-center gap-3">
-                            <div
-                              className={`w-9 h-9 rounded-xl ${pos.color} text-white flex items-center justify-center font-bold text-xs shadow-2xs`}
-                            >
-                              {pos.ticker.slice(0, 2)}
-                            </div>
-                            <div>
-                              <div className="font-semibold text-gray-900">{pos.name}</div>
-                              <div className="text-xs text-gray-500">{pos.ticker} • {pos.type}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6 font-semibold text-gray-900">
-                          {pos.balance} <span className="text-xs text-gray-400 font-normal">{pos.ticker}</span>
-                        </td>
-                        <td className="py-4 px-6 text-gray-700 font-medium">
-                          {pos.price}
-                        </td>
-                        <td className="py-4 px-6 font-semibold text-gray-900">
-                          {pos.value}
-                        </td>
-                        <td className="py-4 px-6">
-                          <span
-                            className={`font-semibold ${
-                              pos.pnlIsPositive ? 'text-emerald-600' : 'text-red-600'
-                            }`}
-                          >
-                            {pos.pnl}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <button
-                              type="button"
-                              className="px-3 py-1.5 bg-gray-900 hover:bg-black text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer"
-                            >
-                              Trade
-                            </button>
-                            <button
-                              type="button"
-                              className="px-3 py-1.5 border border-gray-200 hover:bg-gray-100 text-gray-700 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
-                            >
-                              Redeem
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* Tab Content: Activity */}
-          {activeTab === 'activity' && (
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 sm:p-8 space-y-4">
-              <h3 className="text-base font-semibold text-gray-900">Recent Transactions</h3>
-              <div className="space-y-3">
-                {transactions.map((tx) => (
-                  <div
-                    key={tx.id}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl hover:bg-gray-100/70 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-semibold text-xs">
-                        {tx.type === 'Mint' ? <Plus className="w-4 h-4" /> : <RefreshCw className="w-4 h-4" />}
-                      </div>
-                      <div>
-                        <div className="text-sm font-semibold text-gray-900">
-                          {tx.type} {tx.asset}
-                        </div>
-                        <div className="text-xs text-gray-500">{tx.date}</div>
-                      </div>
-                    </div>
-
-                    <div className="text-right">
-                      <div className="text-sm font-semibold text-gray-900">{tx.amount}</div>
-                      <div className="text-xs text-emerald-600 font-medium">{tx.status} • {tx.txHash}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Tab Content: Yield */}
-          {activeTab === 'yield' && (
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 sm:p-8 space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-base font-semibold text-gray-900">USDY Yield Accumulation</h3>
-                  <p className="text-xs text-gray-500">
-                    USDY accumulates daily token price appreciation backed by short-term US Treasuries.
-                  </p>
-                </div>
-                <div className="bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5">
-                  <Zap className="w-4 h-4" />
-                  <span>5.20% Net APY</span>
-                </div>
-              </div>
-
-              <div className="p-6 bg-gradient-to-r from-blue-900 to-indigo-950 text-white rounded-2xl space-y-4">
-                <div className="text-xs text-blue-200 font-medium">Estimated Annualized Yield</div>
-                <div className="text-3xl font-bold">$270.92 / year</div>
-                <p className="text-xs text-blue-300 leading-relaxed max-w-xl">
-                  Yield is automatically reflected in the USDY token price. You do not need to claim or stake — holding USDY in your wallet automatically generates daily yield.
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
+        <DashboardView
+          connectedWallet={connectedWallet}
+          userEmail={userEmail}
+          onOpenWalletModal={onOpenWalletModal}
+          onSelectAsset={onSelectAsset}
+        />
       )}
     </div>
   );

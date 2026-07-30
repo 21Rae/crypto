@@ -13,7 +13,7 @@ interface NavbarProps {
   onNavigateAccount?: () => void;
   onStartOnboarding?: () => void;
   activeNavTab?: string;
-  onSelectNavTab?: (tab: string) => void;
+  onSelectNavTab?: (tab: string, subTool?: string) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -31,11 +31,28 @@ export const Navbar: React.FC<NavbarProps> = ({
   onSelectNavTab,
 }) => {
   const [currentTab, setCurrentTab] = React.useState<string>(activeNavTab);
+  const [isToolsHovered, setIsToolsHovered] = React.useState<boolean>(false);
+  const hoverTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
-  const handleTabClick = (tab: string) => {
+  React.useEffect(() => {
+    setCurrentTab(activeNavTab);
+  }, [activeNavTab]);
+
+  const handleMouseEnterTools = () => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    setIsToolsHovered(true);
+  };
+
+  const handleMouseLeaveTools = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setIsToolsHovered(false);
+    }, 180);
+  };
+
+  const handleTabClick = (tab: string, subTool?: string) => {
     setCurrentTab(tab);
     if (onSelectNavTab) {
-      onSelectNavTab(tab);
+      onSelectNavTab(tab, subTool);
     }
     if (tab === 'explore' && onNavigateHome) {
       onNavigateHome();
@@ -91,17 +108,79 @@ export const Navbar: React.FC<NavbarProps> = ({
               Portfolio
             </button>
 
-            <button
-              type="button"
-              onClick={() => handleTabClick('tools')}
-              className={`px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-lg transition-colors cursor-pointer ${
-                currentTab === 'tools'
-                  ? 'bg-[#EAEAEA] text-gray-900'
-                  : 'text-gray-900 hover:bg-gray-100'
-              }`}
+            <div
+              className="relative"
+              onMouseEnter={handleMouseEnterTools}
+              onMouseLeave={handleMouseLeaveTools}
             >
-              Tools
-            </button>
+              <button
+                type="button"
+                onClick={() => handleTabClick('tools', 'bridge')}
+                className={`px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-lg transition-colors cursor-pointer ${
+                  currentTab === 'tools' || isToolsHovered
+                    ? 'bg-[#EAEAEA] text-gray-900'
+                    : 'text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                Tools
+              </button>
+
+              {/* Hover Dropdown Menu */}
+              {isToolsHovered && (
+                <div className="absolute top-full left-0 mt-2 w-72 sm:w-80 bg-white rounded-3xl p-3.5 shadow-2xl border border-gray-100 z-50 animate-fadeIn space-y-1">
+                  {/* Bridge Item */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleTabClick('tools', 'bridge');
+                      setIsToolsHovered(false);
+                    }}
+                    className="w-full p-2.5 rounded-2xl hover:bg-gray-50 transition-all flex items-center gap-3.5 text-left cursor-pointer group"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-[#F4F4F5] group-hover:bg-gray-200/80 flex items-center justify-center shrink-0 transition-colors">
+                      <svg className="w-5 h-5 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                        <line x1="8" y1="5" x2="8" y2="19" />
+                        <line x1="16" y1="5" x2="16" y2="19" />
+                        <path d="M8 10h8M8 14h8" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="text-xs sm:text-sm font-bold text-gray-900 group-hover:text-black">
+                        Bridge
+                      </div>
+                      <div className="text-[11px] sm:text-xs text-gray-500 font-normal leading-tight mt-0.5">
+                        Transfer Ondo tokens across chains
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Convert Item */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleTabClick('tools', 'convert');
+                      setIsToolsHovered(false);
+                    }}
+                    className="w-full p-2.5 rounded-2xl hover:bg-gray-50 transition-all flex items-center gap-3.5 text-left cursor-pointer group"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-[#F4F4F5] group-hover:bg-gray-200/80 flex items-center justify-center shrink-0 transition-colors">
+                      <svg className="w-5 h-5 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.85.83 6.72 2.24" />
+                        <path d="M21 3v6h-6" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="text-xs sm:text-sm font-bold text-gray-900 group-hover:text-black">
+                        Convert
+                      </div>
+                      <div className="text-[11px] sm:text-xs text-gray-500 font-normal leading-tight mt-0.5">
+                        Convert Ondo tokens between different forms
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
 
             <button
               type="button"
@@ -173,8 +252,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="flex items-center gap-2">
               <button
                 type="button"
+                disabled
                 onClick={onStartOnboarding}
-                className="px-3.5 py-1.5 text-xs font-medium text-white bg-[#18181B] rounded-lg hover:bg-black transition-colors shadow-2xs cursor-pointer"
+                className="px-3.5 py-1.5 text-xs font-medium text-gray-400 bg-gray-200 rounded-lg opacity-60 cursor-not-allowed shadow-2xs"
               >
                 Complete Onboarding
               </button>

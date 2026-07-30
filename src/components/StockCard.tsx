@@ -2,6 +2,7 @@ import React from 'react';
 import { StockAsset } from '../types';
 import { AssetIcon } from './AssetIcon';
 import { Sparkline } from './Sparkline';
+import { AnimatedNumber } from './AnimatedNumber';
 
 interface StockCardProps {
   asset: StockAsset;
@@ -40,7 +41,7 @@ export const StockCard: React.FC<StockCardProps> = ({ asset, onClick }) => {
       {/* Middle Price & Change Row */}
       <div className="mb-2">
         <div className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
-          ${asset.price.toFixed(2)}
+          <AnimatedNumber value={asset.price} prefix="$" decimals={2} />
         </div>
         <div
           className={`text-[11px] font-bold mt-0.5 flex items-center gap-1 ${
@@ -48,8 +49,9 @@ export const StockCard: React.FC<StockCardProps> = ({ asset, onClick }) => {
           }`}
         >
           <span>{isPositive ? '▲' : '▼'}</span>
+          <AnimatedNumber value={Math.abs(asset.changeAmount)} prefix="$" decimals={2} showFlash={false} />
           <span>
-            ${Math.abs(asset.changeAmount).toFixed(2)} ({Math.abs(asset.changePercent).toFixed(2)}%) 24H
+            (<AnimatedNumber value={Math.abs(asset.changePercent)} suffix="%" decimals={2} showFlash={false} />) 24H
           </span>
         </div>
       </div>

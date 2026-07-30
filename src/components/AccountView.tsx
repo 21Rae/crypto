@@ -156,8 +156,9 @@ export const AccountView: React.FC<AccountViewProps> = ({
                 <div className="pt-2">
                   <button
                     type="button"
+                    disabled
                     onClick={onStartOnboarding}
-                    className="w-full py-3 bg-[#18181B] hover:bg-black text-white text-xs font-semibold rounded-xl transition-all cursor-pointer shadow-xs"
+                    className="w-full py-3 bg-gray-200 text-gray-400 text-xs font-semibold rounded-xl transition-all cursor-not-allowed opacity-60 shadow-xs"
                   >
                     Complete Onboarding to Get Access
                   </button>

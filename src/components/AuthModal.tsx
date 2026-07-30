@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import authBgImg from '../assets/images/ondo_auth_bg_1785259442538.jpg';
+import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -11,14 +12,63 @@ interface AuthModalProps {
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLogin }) => {
   if (!isOpen) return null;
 
+  const [mode, setMode] = useState<'signup' | 'signin'>('signup');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email.trim()) {
-      onLogin(email.trim());
-      onClose();
+    setError('');
+
+    if (!email.trim() || !email.includes('@')) {
+      setError('Please enter a valid email address.');
+      return;
     }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+
+    const supabase = getSupabase();
+
+    if (supabase && isSupabaseConfigured()) {
+      setLoading(true);
+      try {
+        if (mode === 'signup') {
+          const { error: signUpErr } = await supabase.auth.signUp({
+            email: email.trim(),
+            password,
+          });
+          if (signUpErr) {
+            setError(signUpErr.message);
+            setLoading(false);
+            return;
+          }
+        } else {
+          const { error: signInErr } = await supabase.auth.signInWithPassword({
+            email: email.trim(),
+            password,
+          });
+          if (signInErr) {
+            setError(signInErr.message);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (err: any) {
+        setError(err.message || 'Authentication error occurred.');
+        setLoading(false);
+        return;
+      }
+      setLoading(false);
+    }
+
+    onLogin(email.trim());
+    onClose();
   };
 
   return (
@@ -47,7 +97,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLogin }
         </div>
 
         {/* Right Half: Sign up or Sign in Form */}
-        <div className="w-full md:w-1/2 p-6 sm:p-10 md:p-12 lg:p-14 bg-white flex flex-col justify-between relative">
+        <div className="w-full md:w-1/2 p-6 sm:p-10 md:p-12 lg:p-14 bg-white flex flex-col justify-between relative overflow-y-auto">
           {/* Close button */}
           <button
             type="button"
@@ -59,86 +109,126 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLogin }
           </button>
 
           <div>
+            {/* Mode Switcher Tabs */}
+            <div className="inline-flex bg-gray-100 p-1 rounded-xl gap-1 mb-6 text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('signup');
+                  setError('');
+                }}
+                className={`px-4 py-2 rounded-lg transition-all cursor-pointer ${
+                  mode === 'signup'
+                    ? 'bg-white text-gray-900 shadow-2xs font-bold'
+                    : 'text-gray-500 hover:text-gray-900'
+                }`}
+              >
+                Sign Up
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('signin');
+                  setError('');
+                }}
+                className={`px-4 py-2 rounded-lg transition-all cursor-pointer ${
+                  mode === 'signin'
+                    ? 'bg-white text-gray-900 shadow-2xs font-bold'
+                    : 'text-gray-500 hover:text-gray-900'
+                }`}
+              >
+                Sign In
+              </button>
+            </div>
+
             {/* Title & Subtitle */}
-            <div className="mb-8 mt-2">
+            <div className="mb-6">
               <h2 className="text-3xl sm:text-[32px] font-semibold text-gray-900 tracking-tight leading-tight">
-                Sign up or Sign in
+                {mode === 'signup' ? 'Create an account' : 'Welcome back'}
               </h2>
-              <p className="text-sm text-gray-600 font-normal mt-3 leading-relaxed max-w-md">
-                Enter your email to sign in to your account. If you don't have an account yet, one will be created for you.
+              <p className="text-sm text-gray-600 font-normal mt-2 leading-relaxed max-w-md">
+                {mode === 'signup'
+                  ? 'Enter your email and password to create your Ondo account.'
+                  : 'Enter your email and password to sign in to your Ondo account.'}
               </p>
             </div>
 
-            {/* Email Form */}
+            {error && (
+              <div className="mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl font-medium">
+                {error}
+              </div>
+            )}
+
+            {/* Email & Password Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Email Address Input */}
               <div>
-                <label className="block text-xs font-normal text-gray-500 mb-1.5">
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">
                   Email Address
                 </label>
                 <div className="relative flex items-center">
+                  <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 pointer-events-none" />
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder=""
-                    className="w-full bg-[#F2F2F2] border border-transparent rounded-xl px-4 py-3.5 text-sm font-medium text-gray-900 focus:outline-none focus:bg-white focus:border-gray-400 transition-all pr-12"
+                    placeholder="name@example.com"
+                    className="w-full bg-[#F2F2F2] border border-transparent rounded-xl pl-10 pr-4 py-3 text-sm font-medium text-gray-900 focus:outline-none focus:bg-white focus:border-gray-400 transition-all"
                   />
-                  {/* FaceID / Passkey Icon */}
-                  <div className="absolute right-3.5 text-gray-700 pointer-events-none">
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="3" width="18" height="18" rx="5" />
-                      <path d="M8 9h.01" />
-                      <path d="M16 9h.01" />
-                      <path d="M9 15c1.5 1 4.5 1 6 0" />
-                    </svg>
-                  </div>
                 </div>
               </div>
 
-              {/* Continue button */}
+              {/* Password Input */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-medium text-gray-700">
+                    Password
+                  </label>
+                  {mode === 'signin' && (
+                    <a href="#forgot" className="text-[11px] font-medium text-blue-600 hover:underline">
+                      Forgot password?
+                    </a>
+                  )}
+                </div>
+                <div className="relative flex items-center">
+                  <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 pointer-events-none" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={mode === 'signup' ? 'At least 6 characters' : 'Enter your password'}
+                    className="w-full bg-[#F2F2F2] border border-transparent rounded-xl pl-10 pr-10 py-3 text-sm font-medium text-gray-900 focus:outline-none focus:bg-white focus:border-gray-400 transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 text-gray-400 hover:text-gray-700 cursor-pointer"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Continue / Submit button */}
               <button
                 type="submit"
-                disabled={!email.trim()}
-                className={`w-full py-3.5 rounded-xl text-sm font-medium transition-all ${
-                  email.trim()
-                    ? 'bg-black text-white hover:bg-neutral-800 cursor-pointer shadow-xs'
+                disabled={!email.trim() || !password || loading}
+                className={`w-full py-3.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${
+                  email.trim() && password && !loading
+                    ? 'bg-black text-white hover:bg-neutral-800 shadow-xs'
                     : 'bg-[#E5E5E5] text-gray-400 cursor-not-allowed'
                 }`}
               >
-                Continue
+                {loading ? 'Authenticating...' : mode === 'signup' ? 'Create Account' : 'Sign In'}
               </button>
             </form>
-
-            {/* Divider */}
-            <div className="relative my-6 flex items-center justify-center">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
-              </div>
-              <span className="relative bg-white px-4 text-xs font-normal text-gray-500">Or</span>
-            </div>
-
-            {/* Google Sign In button */}
-            <button
-              type="button"
-              onClick={() => {
-                onLogin(email.trim() || 'user@ondo.finance');
-                onClose();
-              }}
-              className="w-full py-3.5 bg-[#1C1C1E] hover:bg-black text-white rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-xs"
-            >
-              <svg className="w-4.5 h-4.5" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
-                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.15C3.26 21.3 7.31 24 12 24z"/>
-                <path fill="#FBBC05" d="M5.28 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.39l3.99-3.15z"/>
-                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.61l3.99 3.15c.95-2.85 3.6-4.96 6.72-4.96z"/>
-              </svg>
-              <span>Continue with Google</span>
-            </button>
           </div>
 
           {/* Legal / Support Footer note */}
-          <div className="mt-8 pt-4 text-[11px] leading-relaxed text-gray-500 font-normal">
+          <div className="mt-6 pt-3 text-[11px] leading-relaxed text-gray-500 font-normal">
             <p>
               By continuing you agree to Ondo's{' '}
               <a href="#privacy" className="underline hover:text-gray-800">
@@ -150,7 +240,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLogin }
               </a>.
             </p>
             <p className="mt-0.5">
-              Forgot your email or need help? Get assistance via{' '}
+              Need help? Contact{' '}
               <a href="mailto:support@ondo.finance" className="underline hover:text-gray-800">
                 support@ondo.finance
               </a>

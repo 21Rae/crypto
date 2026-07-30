@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StockAsset } from '../types';
 import { AssetIcon } from './AssetIcon';
 import { Sparkline } from './Sparkline';
+import { AnimatedNumber } from './AnimatedNumber';
 import { X, CheckCircle2, ArrowUpRight, ArrowDownRight, ShieldCheck, Zap } from 'lucide-react';
 
 interface StockDetailModalProps {
@@ -27,6 +28,49 @@ export const StockDetailModal: React.FC<StockDetailModalProps> = ({
 
   const numShares = parseFloat(amountShares) || 0;
   const totalPrice = numShares * asset.price;
+
+  const chartData = React.useMemo(() => {
+    const base = asset.sparklineData;
+    if (activeTimeframe === '1D') return base;
+    if (activeTimeframe === '1W') {
+      return base.map((v, i) => v * (1 + Math.sin(i * 0.5) * 0.02));
+    }
+    if (activeTimeframe === '1M') {
+      return [
+        base[0] * 0.94,
+        base[1] * 0.92,
+        base[2] * 0.95,
+        base[3] * 0.93,
+        base[4] * 0.97,
+        base[5] * 0.96,
+        base[6] * 0.99,
+        base[base.length - 1],
+      ];
+    }
+    if (activeTimeframe === '1Y') {
+      return [
+        base[0] * 0.82,
+        base[0] * 0.85,
+        base[1] * 0.88,
+        base[2] * 0.84,
+        base[3] * 0.90,
+        base[4] * 0.92,
+        base[5] * 0.96,
+        base[base.length - 1],
+      ];
+    }
+    // ALL
+    return [
+      base[0] * 0.65,
+      base[0] * 0.70,
+      base[1] * 0.74,
+      base[2] * 0.78,
+      base[3] * 0.85,
+      base[4] * 0.89,
+      base[5] * 0.95,
+      base[base.length - 1],
+    ];
+  }, [asset.sparklineData, activeTimeframe]);
 
   const handleExecuteTrade = (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,14 +117,19 @@ export const StockDetailModal: React.FC<StockDetailModalProps> = ({
           </div>
 
           <div className="text-right pr-8">
-            <div className="text-2xl font-black text-gray-900">${asset.price.toFixed(2)}</div>
+            <div className="text-2xl font-black text-gray-900">
+              <AnimatedNumber value={asset.price} prefix="$" decimals={2} />
+            </div>
             <div
               className={`text-xs font-bold flex items-center justify-end gap-1 ${
                 asset.isPositive ? 'text-emerald-600' : 'text-rose-600'
               }`}
             >
               {asset.isPositive ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
-              ${Math.abs(asset.changeAmount).toFixed(2)} ({Math.abs(asset.changePercent).toFixed(2)}%) 24H
+              <AnimatedNumber value={Math.abs(asset.changeAmount)} prefix="$" decimals={2} showFlash={false} />
+              <span>
+                (<AnimatedNumber value={Math.abs(asset.changePercent)} suffix="%" decimals={2} showFlash={false} />) 24H
+              </span>
             </div>
           </div>
         </div>
@@ -115,7 +164,7 @@ export const StockDetailModal: React.FC<StockDetailModalProps> = ({
 
             {/* Price Chart */}
             <div className="bg-gray-50/70 rounded-2xl p-4 border border-gray-100 h-52 relative overflow-hidden">
-              <Sparkline data={asset.sparklineData} isPositive={asset.isPositive} height={180} />
+              <Sparkline key={activeTimeframe} data={chartData} isPositive={asset.isPositive} height={180} />
             </div>
 
             {/* Key Stock Metrics Grid */}
