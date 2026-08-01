@@ -17,11 +17,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLogin }
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccessMessage('');
 
     if (!email.trim() || !email.includes('@')) {
       setError('Please enter a valid email address.');
@@ -35,40 +37,61 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLogin }
 
     const supabase = getSupabase();
 
-    if (supabase && isSupabaseConfigured()) {
-      setLoading(true);
-      try {
-        if (mode === 'signup') {
-          const { error: signUpErr } = await supabase.auth.signUp({
-            email: email.trim(),
-            password,
-          });
-          if (signUpErr) {
-            setError(signUpErr.message);
-            setLoading(false);
-            return;
-          }
-        } else {
-          const { error: signInErr } = await supabase.auth.signInWithPassword({
-            email: email.trim(),
-            password,
-          });
-          if (signInErr) {
-            setError(signInErr.message);
-            setLoading(false);
-            return;
-          }
-        }
-      } catch (err: any) {
-        setError(err.message || 'Authentication error occurred.');
-        setLoading(false);
-        return;
-      }
-      setLoading(false);
+    if (!supabase || !isSupabaseConfigured()) {
+      setError(
+        'Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in environment variables to enable live Supabase authentication.'
+      );
+      return;
     }
 
-    onLogin(email.trim());
-    onClose();
+    setLoading(true);
+    try {
+      if (mode === 'signup') {
+        const { data, error: signUpErr } = await supabase.auth.signUp({
+          email: email.trim(),
+          password,
+        });
+
+        if (signUpErr) {
+          setError(signUpErr.message);
+          setLoading(false);
+          return;
+        }
+
+        if (data?.session && data?.user?.email) {
+          onLogin(data.user.email);
+          onClose();
+        } else if (data?.user) {
+          setSuccessMessage(
+            'Account created with Supabase! Check your email for a confirmation link to activate your account.'
+          );
+        } else {
+          setError('Sign up failed. Please try again.');
+        }
+      } else {
+        const { data, error: signInErr } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
+
+        if (signInErr) {
+          setError(signInErr.message);
+          setLoading(false);
+          return;
+        }
+
+        if (data?.user?.email) {
+          onLogin(data.user.email);
+          onClose();
+        } else {
+          setError('Sign in failed. Could not retrieve user account from Supabase.');
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || 'Authentication error occurred.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -156,6 +179,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLogin }
             {error && (
               <div className="mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl font-medium">
                 {error}
+              </div>
+            )}
+
+            {successMessage && (
+              <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl font-medium">
+                {successMessage}
               </div>
             )}
 

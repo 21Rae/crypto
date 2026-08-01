@@ -323,21 +323,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 animate-fadeIn font-sans">
+    <div className="max-w-7xl w-full mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8 animate-fadeIn font-sans overflow-x-hidden">
       {/* 1. Welcome Header Bar */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-sm shadow-2xs">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-sm shadow-2xs shrink-0">
             ☘
           </div>
-          <div className="text-base font-normal text-gray-800">
+          <div className="text-sm sm:text-base font-normal text-gray-800 truncate">
             Welcome, <strong className="font-semibold text-gray-900">{displayWallet}</strong>
           </div>
         </div>
 
         <button
           type="button"
-          className="p-2 border border-gray-200/80 rounded-xl hover:bg-gray-50 transition-colors text-gray-600 cursor-pointer"
+          className="p-2 border border-gray-200/80 rounded-xl hover:bg-gray-50 transition-colors text-gray-600 cursor-pointer shrink-0"
           title="Date calendar"
         >
           <Calendar className="w-4 h-4" />
@@ -345,13 +345,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       </div>
 
       {/* 2. Main Balance & Area Chart Card */}
-      <div className="bg-white rounded-3xl p-6 sm:p-7 border border-gray-100 shadow-2xs space-y-6">
+      <div className="bg-white rounded-3xl p-4 sm:p-6 lg:p-7 border border-gray-100 shadow-2xs space-y-5 sm:space-y-6 w-full max-w-full overflow-hidden">
         {/* Balance & Subtitle */}
         <div className="space-y-1">
-          <div className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+          <div className="text-2xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
             <AnimatedNumber value={0.15} prefix="$" decimals={2} />
           </div>
-          <div className="text-xs font-semibold text-gray-500 flex items-center gap-1.5">
+          <div className="text-xs font-semibold text-gray-500 flex items-center gap-1.5 flex-wrap">
             <span>
               <AnimatedNumber value={0.00} prefix="$" decimals={2} showFlash={false} />
             </span>
@@ -360,13 +360,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Timeframe Selector Pills */}
-        <div className="inline-flex items-center bg-gray-50 border border-gray-200/80 rounded-xl p-1 gap-1 text-xs font-semibold text-gray-600">
+        <div className="inline-flex items-center bg-gray-50 border border-gray-200/80 rounded-xl p-1 gap-1 text-xs font-semibold text-gray-600 max-w-full overflow-x-auto">
           {(['1D', '1W', '1M', '3M', '1Y', 'ALL'] as const).map((tf) => (
             <button
               key={tf}
               type="button"
               onClick={() => setActiveTimeframe(tf)}
-              className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+              className={`px-2.5 sm:px-3 py-1 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
                 activeTimeframe === tf
                   ? 'bg-white text-gray-900 shadow-2xs font-bold border border-gray-200/50'
                   : 'hover:text-gray-900'
@@ -379,7 +379,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
         {/* Green Area Sparkline Graph with X-Axis Dates */}
         <div className="pt-2">
-          <div className="w-full h-44 sm:h-52 relative">
+          <div className="w-full h-36 sm:h-52 relative">
             <svg className="w-full h-full overflow-visible" viewBox="0 0 300 120" preserveAspectRatio="none">
               <defs>
                 <linearGradient id="dashboardGrad" x1="0" y1="0" x2="0" y2="1">
@@ -411,17 +411,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       </div>
 
       {/* 3. My Holdings Section */}
-      <div className="bg-white rounded-3xl p-6 sm:p-7 border border-gray-100 shadow-2xs space-y-5">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <h2 className="text-xl font-bold text-gray-900 tracking-tight">My Holdings</h2>
+      <div className="bg-white rounded-3xl p-4 sm:p-6 lg:p-7 border border-gray-100 shadow-2xs space-y-4 sm:space-y-5 w-full max-w-full overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 tracking-tight">My Holdings</h2>
 
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2">
             {/* Filter 1: Asset Class */}
-            <div className="relative">
+            <div className="relative flex-1 sm:flex-initial min-w-[120px]">
               <select
                 value={selectedAssetClass}
                 onChange={(e) => setSelectedAssetClass(e.target.value)}
-                className="appearance-none bg-gray-50 border border-gray-200/80 rounded-xl px-3.5 py-1.5 pr-8 text-xs font-semibold text-gray-700 cursor-pointer hover:bg-gray-100/80 transition-colors"
+                className="w-full appearance-none bg-gray-50/80 border border-gray-200/80 rounded-xl px-3 py-1.5 pr-7 text-xs font-medium text-gray-700 cursor-pointer hover:bg-gray-100/80 transition-colors"
               >
                 <option value="All">Asset Class</option>
                 <option value="Crypto">Crypto</option>
@@ -431,11 +431,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
 
             {/* Filter 2: Network */}
-            <div className="relative">
+            <div className="relative flex-1 sm:flex-initial min-w-[120px]">
               <select
                 value={selectedNetwork}
                 onChange={(e) => setSelectedNetwork(e.target.value)}
-                className="appearance-none bg-gray-50 border border-gray-200/80 rounded-xl px-3.5 py-1.5 pr-8 text-xs font-semibold text-gray-700 cursor-pointer hover:bg-gray-100/80 transition-colors"
+                className="w-full appearance-none bg-gray-50/80 border border-gray-200/80 rounded-xl px-3 py-1.5 pr-7 text-xs font-medium text-gray-700 cursor-pointer hover:bg-gray-100/80 transition-colors"
               >
                 <option value="All">Network</option>
                 <option value="BNB Chain">BNB Chain</option>
@@ -447,42 +447,38 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Search input */}
-        <div className="relative max-w-full">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-2.5" />
+        <div className="relative w-full max-w-full">
+          <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-2.5 pointer-events-none" />
           <input
             type="text"
             placeholder="Search asset"
             value={holdingsSearch}
             onChange={(e) => setHoldingsSearch(e.target.value)}
-            className="w-full bg-gray-50/80 border border-gray-200/80 rounded-2xl pl-10 pr-4 py-2 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+            className="w-full min-w-0 max-w-full box-border bg-gray-50/80 border border-gray-200/80 rounded-2xl pl-10 pr-4 py-2 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
           />
         </div>
 
-        {/* USDC & USDT Summary Highlight Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
-          {/* USDC Card */}
-          <div className="bg-[#EDF4FF] border border-blue-100 rounded-2xl p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-sm shadow-2xs">
-                $
-              </div>
-              <div>
-                <div className="text-xs font-semibold text-gray-600">USDC</div>
-                <div className="text-lg font-bold text-gray-900">$0</div>
-              </div>
+        {/* USDT & USDC Summary Highlight Cards */}
+        <div className="space-y-2.5 sm:space-y-3 w-full max-w-full">
+          {/* USDT Card - Light Green */}
+          <div className="bg-[#EBF5EE] border border-emerald-100/60 rounded-2xl p-3.5 sm:p-4 flex items-center gap-3.5 w-full min-w-0 max-w-full box-border">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#26A17B] text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
+              ₮
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-xs font-medium text-emerald-900 truncate">USDT</div>
+              <div className="text-lg sm:text-xl font-bold text-gray-900 truncate">$0</div>
             </div>
           </div>
 
-          {/* USDT Card */}
-          <div className="bg-[#EFF5EE] border border-emerald-100 rounded-2xl p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-sm shadow-2xs">
-                ₮
-              </div>
-              <div>
-                <div className="text-xs font-semibold text-gray-600">USDT</div>
-                <div className="text-lg font-bold text-gray-900">$0</div>
-              </div>
+          {/* USDC Card - Light Blue */}
+          <div className="bg-[#EDF4FF] border border-blue-100/60 rounded-2xl p-3.5 sm:p-4 flex items-center gap-3.5 w-full min-w-0 max-w-full box-border">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#2775CA] text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
+              $
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-xs font-medium text-blue-900 truncate">USDC</div>
+              <div className="text-lg sm:text-xl font-bold text-gray-900 truncate">$0</div>
             </div>
           </div>
         </div>
@@ -491,20 +487,26 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="overflow-x-auto pt-2">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="text-gray-400 font-semibold border-b border-gray-100 pb-2">
+              <tr className="text-gray-500 font-semibold border-b border-gray-100 pb-2">
                 <th className="py-3 font-normal">Token</th>
                 <th className="py-3 font-normal">Asset Class</th>
                 <th className="py-3 font-normal">Price ($)</th>
                 <th className="py-3 font-normal">Balance</th>
-                <th className="py-3 font-normal text-right">Value ($)</th>
+                <th className="py-3 font-normal">
+                  <div className="flex items-center gap-1">
+                    <span>Value ($)</span>
+                    <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+                  </div>
+                </th>
+                <th className="py-3 font-normal text-right"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 font-medium text-gray-800">
               {filteredHoldings.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50/60 transition-colors">
+                <tr key={item.id} className="hover:bg-gray-50/60 transition-colors group cursor-pointer">
                   <td className="py-3.5">
-                    <div className="flex items-center gap-2.5">
-                      <div className={`w-7 h-7 rounded-full ${item.iconBg} flex items-center justify-center font-bold text-xs shadow-2xs`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-full ${item.iconBg} flex items-center justify-center font-bold text-xs shadow-2xs flex-shrink-0`}>
                         {item.symbol}
                       </div>
                       <div>
@@ -514,12 +516,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                             <span className="text-blue-500 font-bold text-[10px]" title="Verified">✔</span>
                           )}
                         </div>
-                        <div className="text-[10px] text-gray-400">{item.ticker}</div>
+                        <div className="text-[11px] text-gray-400">{item.ticker}</div>
                       </div>
                     </div>
                   </td>
                   <td className="py-3.5">
-                    <span className="bg-purple-50 text-purple-700 px-2.5 py-1 rounded-full text-[10px] font-bold border border-purple-100">
+                    <span className="bg-[#F3E8FF] text-[#7E22CE] px-3 py-1 rounded-full text-[11px] font-semibold">
                       {item.class}
                     </span>
                   </td>
@@ -529,26 +531,74 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <td className="py-3.5 font-semibold text-gray-900">
                     {item.balance}
                   </td>
-                  <td className="py-3.5 font-bold text-gray-900 text-right">
+                  <td className="py-3.5 font-bold text-gray-900">
                     ${item.value.toFixed(2)}
+                  </td>
+                  <td className="py-3.5 text-right">
+                    <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-700 transition-colors inline-block" />
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+
+        {/* Bottom Portfolio Summary Stats Bar matching Screenshot 2 */}
+        <div className="bg-white border border-gray-100 rounded-2xl p-4 grid grid-cols-1 md:grid-cols-3 gap-4 shadow-2xs divide-y md:divide-y-0 md:divide-x divide-gray-100">
+          {/* Card 1: Total Assets (USD) */}
+          <div className="flex items-center gap-3.5 pt-2 md:pt-0">
+            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
+                <path d="M22 12A10 10 0 0 0 12 2v10z" />
+              </svg>
+            </div>
+            <div>
+              <div className="text-[11px] font-medium text-gray-500">Total Assets (USD)</div>
+              <div className="text-lg font-extrabold text-gray-900">$0.15</div>
+            </div>
+          </div>
+
+          {/* Card 2: Total Balance */}
+          <div className="flex items-center gap-3.5 pt-3 md:pt-0 md:pl-4">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <line x1="2" y1="10" x2="22" y2="10" />
+              </svg>
+            </div>
+            <div>
+              <div className="text-[11px] font-medium text-gray-500">Total Balance</div>
+              <div className="text-lg font-extrabold text-gray-900">16.0003</div>
+            </div>
+          </div>
+
+          {/* Card 3: 24h Change */}
+          <div className="flex items-center gap-3.5 pt-3 md:pt-0 md:pl-4">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                <polyline points="17 6 23 6 23 12" />
+              </svg>
+            </div>
+            <div>
+              <div className="text-[11px] font-medium text-gray-500">24h Change</div>
+              <div className="text-lg font-extrabold text-emerald-600">$0.00 (0.00%)</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 4. Portfolio Allocation Section */}
-      <div className="bg-white rounded-3xl p-6 sm:p-7 border border-gray-100 shadow-2xs space-y-6">
-        <h2 className="text-xl font-bold text-gray-900 tracking-tight">Portfolio Allocation</h2>
+      <div className="bg-white rounded-3xl p-4 sm:p-6 lg:p-7 border border-gray-100 shadow-2xs space-y-5 sm:space-y-6 w-full max-w-full overflow-hidden">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900 tracking-tight">Portfolio Allocation</h2>
 
         {/* Allocation Category Tabs */}
-        <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
+        <div className="flex items-center gap-2 border-b border-gray-100 pb-3 overflow-x-auto max-w-full">
           <button
             type="button"
             onClick={() => setAllocationTab('all')}
-            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+            className={`px-3.5 sm:px-4 py-1.5 sm:py-2 text-xs font-bold rounded-xl transition-all cursor-pointer whitespace-nowrap ${
               allocationTab === 'all'
                 ? 'bg-gray-900 text-white shadow-2xs'
                 : 'text-gray-600 hover:bg-gray-100'
@@ -559,7 +609,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <button
             type="button"
             onClick={() => setAllocationTab('crypto')}
-            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+            className={`px-3.5 sm:px-4 py-1.5 sm:py-2 text-xs font-bold rounded-xl transition-all cursor-pointer whitespace-nowrap ${
               allocationTab === 'crypto'
                 ? 'bg-gray-900 text-white shadow-2xs'
                 : 'text-gray-600 hover:bg-gray-100'
@@ -570,7 +620,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <button
             type="button"
             onClick={() => setAllocationTab('ondo')}
-            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+            className={`px-3.5 sm:px-4 py-1.5 sm:py-2 text-xs font-bold rounded-xl transition-all cursor-pointer whitespace-nowrap ${
               allocationTab === 'ondo'
                 ? 'bg-gray-900 text-white shadow-2xs'
                 : 'text-gray-600 hover:bg-gray-100'
@@ -581,7 +631,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Big Donut Ring Chart with Center Box */}
-        <div className="relative w-56 h-56 sm:w-64 sm:h-64 mx-auto flex items-center justify-center my-4">
+        <div className="relative w-48 h-48 sm:w-64 sm:h-64 mx-auto flex items-center justify-center my-3 sm:my-4">
           <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
             {/* Outer Background Circle */}
             <circle
@@ -607,9 +657,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </svg>
 
           {/* Center Box Overlay */}
-          <div className="absolute bg-white/90 backdrop-blur-xs border border-gray-200/80 rounded-2xl p-3 shadow-md text-center min-w-[110px]">
-            <div className="text-base font-extrabold text-gray-900">$0.15</div>
-            <div className="text-[10px] font-semibold text-gray-500 tracking-tight border-t border-gray-100 pt-1 mt-1">
+          <div className="absolute bg-white/90 backdrop-blur-xs border border-gray-200/80 rounded-2xl p-2.5 sm:p-3 shadow-md text-center min-w-[100px] sm:min-w-[110px]">
+            <div className="text-sm sm:text-base font-extrabold text-gray-900">$0.15</div>
+            <div className="text-[9px] sm:text-[10px] font-semibold text-gray-500 tracking-tight border-t border-gray-100 pt-1 mt-1">
               ALL | 100.00%
             </div>
           </div>
@@ -617,46 +667,46 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
         {/* Allocation Legend Details */}
         <div className="space-y-3 pt-2">
-          <div className="text-base font-bold text-gray-900">All Assets</div>
+          <div className="text-sm sm:text-base font-bold text-gray-900">All Assets</div>
           <div className="text-xs text-gray-500 font-medium">
             Total Value: <strong className="text-gray-900 font-bold">$0.15</strong> • 100.00% of Portfolio
           </div>
 
           <div className="space-y-2.5 pt-2 text-xs">
             {/* Crypto Legend Row */}
-            <div className="flex items-center justify-between p-2.5 bg-gray-50/80 rounded-2xl border border-gray-100">
-              <div className="flex items-center gap-2.5">
-                <span className="w-3 h-3 rounded-md bg-purple-500" />
+            <div className="flex items-center justify-between p-2.5 bg-gray-50/80 rounded-2xl border border-gray-100 gap-2">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-md bg-purple-500 shrink-0" />
                 <span className="font-bold text-gray-900">Crypto</span>
                 <span className="text-[10px] bg-white border border-gray-200 text-gray-600 px-1.5 py-0.5 rounded-md font-semibold">
                   +3
                 </span>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-4 shrink-0">
                 <span className="font-semibold text-gray-600">98.70%</span>
                 <span className="font-bold text-gray-900">$0.15</span>
               </div>
             </div>
 
             {/* Ondo Stocks Legend Row */}
-            <div className="flex items-center justify-between p-2.5 bg-gray-50/80 rounded-2xl border border-gray-100">
-              <div className="flex items-center gap-2.5">
-                <span className="w-3 h-3 rounded-md bg-emerald-500" />
+            <div className="flex items-center justify-between p-2.5 bg-gray-50/80 rounded-2xl border border-gray-100 gap-2">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-md bg-emerald-500 shrink-0" />
                 <span className="font-bold text-gray-900">Ondo Stocks</span>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-4 shrink-0">
                 <span className="font-semibold text-gray-600">0.00%</span>
                 <span className="font-bold text-gray-900">$0</span>
               </div>
             </div>
 
             {/* Cash Legend Row */}
-            <div className="flex items-center justify-between p-2.5 bg-gray-50/80 rounded-2xl border border-gray-100">
-              <div className="flex items-center gap-2.5">
-                <span className="w-3 h-3 rounded-md bg-amber-500" />
+            <div className="flex items-center justify-between p-2.5 bg-gray-50/80 rounded-2xl border border-gray-100 gap-2">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-md bg-amber-500 shrink-0" />
                 <span className="font-bold text-gray-900">Cash</span>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-4 shrink-0">
                 <span className="font-semibold text-gray-600">0.00%</span>
                 <span className="font-bold text-gray-900">$0</span>
               </div>
@@ -666,13 +716,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       </div>
 
       {/* 5. Recent Transactions Section */}
-      <div className="bg-white rounded-3xl p-6 sm:p-7 border border-gray-100 shadow-2xs space-y-5">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <h2 className="text-xl font-bold text-gray-900 tracking-tight">Recent Transactions</h2>
+      <div className="bg-white rounded-3xl p-4 sm:p-6 lg:p-7 border border-gray-100 shadow-2xs space-y-4 sm:space-y-5 w-full max-w-full overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 tracking-tight">Recent Transactions</h2>
 
-          <div className="flex flex-wrap items-center gap-2.5">
-            <div className="relative">
-              <select className="appearance-none bg-gray-50 border border-gray-200/80 rounded-xl px-3.5 py-1.5 pr-8 text-xs font-semibold text-gray-700 cursor-pointer hover:bg-gray-100/80 transition-colors">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative flex-1 sm:flex-initial min-w-[110px]">
+              <select className="w-full appearance-none bg-gray-50 border border-gray-200/80 rounded-xl px-3 py-1.5 pr-7 text-xs font-semibold text-gray-700 cursor-pointer hover:bg-gray-100/80 transition-colors">
                 <option value="All">Type</option>
                 <option value="Sent">Sent</option>
                 <option value="Swapped">Swapped</option>
@@ -682,8 +732,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <ChevronDown className="w-3.5 h-3.5 text-gray-500 absolute right-2.5 top-2.5 pointer-events-none" />
             </div>
 
-            <div className="relative">
-              <select className="appearance-none bg-gray-50 border border-gray-200/80 rounded-xl px-3.5 py-1.5 pr-8 text-xs font-semibold text-gray-700 cursor-pointer hover:bg-gray-100/80 transition-colors">
+            <div className="relative flex-1 sm:flex-initial min-w-[110px]">
+              <select className="w-full appearance-none bg-gray-50 border border-gray-200/80 rounded-xl px-3 py-1.5 pr-7 text-xs font-semibold text-gray-700 cursor-pointer hover:bg-gray-100/80 transition-colors">
                 <option value="All">Network</option>
                 <option value="BNB Chain">BNB Chain</option>
                 <option value="Ethereum">Ethereum</option>
@@ -694,20 +744,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Transaction Search Bar */}
-        <div className="relative max-w-full">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-2.5" />
+        <div className="relative w-full max-w-full">
+          <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-2.5 pointer-events-none" />
           <input
             type="text"
             placeholder="Search"
             value={txSearch}
             onChange={(e) => setTxSearch(e.target.value)}
-            className="w-full bg-gray-50/80 border border-gray-200/80 rounded-2xl pl-10 pr-4 py-2 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+            className="w-full min-w-0 max-w-full box-border bg-gray-50/80 border border-gray-200/80 rounded-2xl pl-10 pr-4 py-2 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
           />
         </div>
 
         {/* Transactions Table matching exact screenshot */}
-        <div className="overflow-x-auto pt-1">
-          <table className="w-full text-left text-xs border-collapse">
+        <div className="overflow-x-auto pt-1 w-full max-w-full">
+          <table className="w-full min-w-[500px] text-left text-xs border-collapse">
             <thead>
               <tr className="text-gray-400 font-semibold border-b border-gray-100 pb-2">
                 <th className="py-3 font-normal">Date and Time</th>
@@ -731,7 +781,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   </td>
                   <td className="py-3.5">
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-amber-400 text-black flex items-center justify-center font-bold text-[10px]">
+                      <div className="w-6 h-6 rounded-full bg-amber-400 text-black flex items-center justify-center font-bold text-[10px] shrink-0">
                         BNB
                       </div>
                       <div>
@@ -767,9 +817,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       </div>
 
       {/* 6. Investors Also Own Section */}
-      <div className="bg-white rounded-3xl p-6 sm:p-7 border border-gray-100 shadow-2xs space-y-6">
+      <div className="bg-white rounded-3xl p-4 sm:p-6 lg:p-7 border border-gray-100 shadow-2xs space-y-5 sm:space-y-6 w-full max-w-full overflow-hidden">
         <div className="space-y-1">
-          <h2 className="text-xl font-bold text-gray-900 tracking-tight">Investors Also Own</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 tracking-tight">Investors Also Own</h2>
           <p className="text-xs text-gray-500 font-normal">
             Start building your portfolio with Ondo's latest investment opportunities.
           </p>
@@ -779,38 +829,38 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <button
             type="button"
             onClick={onNavigateExplore}
-            className="px-5 py-2.5 bg-gray-50 hover:bg-gray-100/80 text-gray-900 border border-gray-200/80 text-xs font-bold rounded-2xl transition-colors cursor-pointer"
+            className="px-4 sm:px-5 py-2 sm:py-2.5 bg-gray-50 hover:bg-gray-100/80 text-gray-900 border border-gray-200/80 text-xs font-bold rounded-2xl transition-colors cursor-pointer"
           >
             Explore 200+ Assets
           </button>
         </div>
 
         {/* Stock Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
           {investorsAssets.map((asset) => (
             <div
               key={asset.id}
               onClick={() => onSelectAsset?.(asset)}
-              className="bg-gray-50/70 border border-gray-200/70 rounded-2xl p-4 space-y-3 cursor-pointer hover:shadow-md transition-all group"
+              className="bg-gray-50/70 border border-gray-200/70 rounded-2xl p-3.5 sm:p-4 space-y-3 cursor-pointer hover:shadow-md transition-all group min-w-0"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-blue-600 text-white font-bold flex items-center justify-center text-xs">
+                <div className="w-8 h-8 rounded-xl bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0">
                   {asset.ticker.slice(0, 3)}
                 </div>
-                <div>
-                  <div className="text-xs font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
                     {asset.ticker}
                   </div>
-                  <div className="text-[10px] text-gray-400">{asset.name}</div>
+                  <div className="text-[10px] text-gray-400 truncate">{asset.name}</div>
                 </div>
               </div>
 
               <div>
-                <div className="text-xl font-extrabold text-gray-900">
+                <div className="text-lg sm:text-xl font-extrabold text-gray-900">
                   <AnimatedNumber value={asset.price} prefix="$" decimals={2} />
                 </div>
                 <div
-                  className={`text-[11px] font-bold flex items-center gap-1 ${
+                  className={`text-[11px] font-bold flex items-center gap-1 flex-wrap ${
                     asset.isPositive ? 'text-emerald-600' : 'text-rose-600'
                   }`}
                 >

@@ -13,9 +13,9 @@ import { PortfolioView } from './components/PortfolioView';
 import { ToolsView } from './components/ToolsView';
 import { ResourcesView } from './components/ResourcesView';
 import { StockDetailModal } from './components/StockDetailModal';
-import { AccessDeeperAnalysesBanner } from './components/AccessDeeperAnalysesBanner';
 import { EXPLORE_ASSETS } from './data/stocks';
 import { StockAsset } from './types';
+import { getSupabase } from './lib/supabase';
 
 export default function App() {
   const [assets, setAssets] = useState<StockAsset[]>(EXPLORE_ASSETS);
@@ -29,6 +29,32 @@ export default function App() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<'explore' | 'portfolio' | 'tools' | 'resources' | 'account'>('explore');
   const [selectedSubTool, setSelectedSubTool] = useState<string | undefined>(undefined);
+
+  // Sync session directly with Supabase auth
+  useEffect(() => {
+    const supabase = getSupabase();
+    if (!supabase) return;
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user?.email) {
+        setUserEmail(session.user.email);
+      }
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user?.email) {
+        setUserEmail(session.user.email);
+      } else {
+        setUserEmail(null);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   // Live real-time price tick simulation for dynamic animated charts
   useEffect(() => {
@@ -65,10 +91,14 @@ export default function App() {
   const handleLogin = (email: string) => {
     setUserEmail(email);
     setCurrentView('portfolio');
-    setIsWelcomeModalOpen(true);
+    setIsWelcomeModalOpen(false);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const supabase = getSupabase();
+    if (supabase) {
+      await supabase.auth.signOut();
+    }
     setUserEmail(null);
     setCurrentView('explore');
     setIsWelcomeModalOpen(false);
@@ -163,11 +193,6 @@ export default function App() {
         )}
       </div>
 
-      {/* Access Deeper Analyses Today Banner (Just Above Footer) */}
-      {currentView !== 'portfolio' && !connectedWallet && (
-        <AccessDeeperAnalysesBanner onConnectWallet={() => setIsWalletModalOpen(true)} />
-      )}
-
       {/* Comprehensive Ondo Legal Disclaimer Footer */}
       <Footer />
 
@@ -195,7 +220,7 @@ export default function App() {
 
       {isOnboardingOpen && (
         <OnboardingView
-          userEmail={userEmail || 'emmanuelsolomon325@gmail.com'}
+          userEmail={userEmail || ''}
           onExit={() => setIsOnboardingOpen(false)}
           onComplete={() => {
             setIsOnboardingOpen(false);

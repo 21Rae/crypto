@@ -215,16 +215,7 @@ export const AccessDeeperAnalysesBanner: React.FC<AccessDeeperAnalysesBannerProp
           <p className="text-xs sm:text-sm text-slate-300 font-normal leading-relaxed max-w-md mx-auto lg:mx-0">
             Get a 360 view on your onchain holdings and tokenized stock exposure. The global markets await.
           </p>
-          <div className="pt-2">
-            <button
-              type="button"
-              disabled
-              onClick={onConnectWallet}
-              className="inline-flex items-center justify-center px-6 py-3 bg-[#1C263A] text-white text-sm font-semibold rounded-xl border border-slate-700/60 transition-all opacity-50 cursor-not-allowed shadow-lg"
-            >
-              Connect Wallet
-            </button>
-          </div>
+
         </div>
 
         {/* Right 3D Animated Globe Canvas Column */}
